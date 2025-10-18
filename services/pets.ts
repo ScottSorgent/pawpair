@@ -1,5 +1,8 @@
 import { Pet, Profile } from '@/types';
 import { supabase } from './supabase';
+import { mockPets } from './mockPetData';
+
+const USE_MOCK_DATA = true;
 
 const mapPetFromDB = (dbPet: any): Pet => ({
   id: dbPet.id,
@@ -23,6 +26,11 @@ const mapPetFromDB = (dbPet: any): Pet => ({
 
 export const pets = {
   async list(): Promise<Pet[]> {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      return mockPets.filter(pet => pet.availableForAdoption);
+    }
+
     const { data, error } = await supabase
       .from('pets')
       .select('*')
@@ -37,6 +45,26 @@ export const pets = {
   },
 
   async recommended(userProfile: Profile): Promise<Pet[]> {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      let filteredPets = mockPets.filter(pet => pet.availableForAdoption);
+
+      if (userProfile.preferences.species && userProfile.preferences.species.length > 0) {
+        filteredPets = filteredPets.filter(pet =>
+          userProfile.preferences.species!.includes(pet.species)
+        );
+      }
+
+      if (userProfile.preferences.size && userProfile.preferences.size.length > 0) {
+        filteredPets = filteredPets.filter(pet =>
+          userProfile.preferences.size!.includes(pet.size)
+        );
+      }
+
+      return filteredPets.slice(0, 10);
+    }
+
     let query = supabase
       .from('pets')
       .select('*')
@@ -62,6 +90,15 @@ export const pets = {
   },
 
   async get(petId: string): Promise<Pet> {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      const pet = mockPets.find(p => p.id === petId);
+      if (!pet) {
+        throw new Error('Pet not found');
+      }
+      return pet;
+    }
+
     const { data, error } = await supabase
       .from('pets')
       .select('*')
@@ -80,6 +117,18 @@ export const pets = {
   },
 
   async search(query: string): Promise<Pet[]> {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 250));
+      const searchLower = query.toLowerCase();
+      return mockPets.filter(pet =>
+        pet.availableForAdoption && (
+          pet.name.toLowerCase().includes(searchLower) ||
+          pet.breed?.toLowerCase().includes(searchLower) ||
+          pet.species.toLowerCase().includes(searchLower)
+        )
+      );
+    }
+
     const { data, error } = await supabase
       .from('pets')
       .select('*')
