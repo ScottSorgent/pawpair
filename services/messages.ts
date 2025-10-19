@@ -1,8 +1,52 @@
 import { Message, Thread } from '@/types';
 import { supabase } from './supabase';
 
+const USE_MOCK_DATA = true;
+
+const mockThreads: Thread[] = [
+  {
+    id: 'thread-1',
+    userId: 'demo-user-1',
+    shelterId: 'shelter-1',
+    shelterName: 'Happy Paws Shelter',
+    lastMessage: 'Thanks for your interest in Max! When would you like to visit?',
+    lastMessageTime: new Date(Date.now() - 3600000),
+    unreadCount: 1,
+  },
+];
+
+const mockMessages: Message[] = [
+  {
+    id: 'msg-1',
+    threadId: 'thread-1',
+    senderId: 'demo-user-1',
+    senderName: 'Demo User',
+    senderType: 'user',
+    content: 'Hi, I am interested in meeting Max!',
+    timestamp: new Date(Date.now() - 7200000),
+    read: true,
+  },
+  {
+    id: 'msg-2',
+    threadId: 'thread-1',
+    senderId: 'shelter-1',
+    senderName: 'Happy Paws Shelter',
+    senderType: 'shelter',
+    content: 'Thanks for your interest in Max! When would you like to visit?',
+    timestamp: new Date(Date.now() - 3600000),
+    read: false,
+  },
+];
+
 export const messages = {
   async listThreads(userId: string): Promise<Thread[]> {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      return mockThreads
+        .filter(t => t.userId === userId)
+        .sort((a, b) => b.lastMessageTime.getTime() - a.lastMessageTime.getTime());
+    }
+
     const { data, error } = await supabase
       .from('messages')
       .select(`
@@ -42,6 +86,15 @@ export const messages = {
   },
 
   async getThread(threadId: string): Promise<Thread> {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 150));
+      const thread = mockThreads.find(t => t.id === threadId);
+      if (!thread) {
+        throw new Error('Thread not found');
+      }
+      return thread;
+    }
+
     const { data: messages, error } = await supabase
       .from('messages')
       .select('*')
@@ -71,6 +124,13 @@ export const messages = {
   },
 
   async getMessages(threadId: string): Promise<Message[]> {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 150));
+      return mockMessages
+        .filter(m => m.threadId === threadId)
+        .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    }
+
     const { data, error } = await supabase
       .from('messages')
       .select('*')
@@ -94,6 +154,22 @@ export const messages = {
   },
 
   async sendMessage(threadId: string, senderId: string, content: string): Promise<Message> {
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      const newMessage: Message = {
+        id: `msg-${Date.now()}`,
+        threadId,
+        senderId,
+        senderName: 'Demo User',
+        senderType: 'user',
+        content,
+        timestamp: new Date(),
+        read: true,
+      };
+      mockMessages.push(newMessage);
+      return newMessage;
+    }
+
     const { data, error } = await supabase
       .from('messages')
       .insert({

@@ -33,9 +33,41 @@ interface AppState {
   clearStore: () => void;
 }
 
+const DEMO_USER: User = {
+  id: 'demo-user-1',
+  email: 'demo@pawpair.com',
+  name: 'Demo User',
+};
+
+const DEMO_PROFILE: Profile = {
+  userId: 'demo-user-1',
+  email: 'demo@pawpair.com',
+  name: 'Demo User',
+  preferences: {
+    species: ['Dog', 'Cat'],
+    size: ['Small', 'Medium', 'Large'],
+    age: ['Young', 'Adult'],
+  },
+  location: {
+    latitude: 37.7749,
+    longitude: -122.4194,
+    city: 'San Francisco',
+  },
+  lifestyle: {
+    homeType: 'House',
+    hoursAtHome: '4-6 hours',
+    activityLevel: 'Medium',
+    preferredPetEnergy: 'Medium',
+    hasChildren: false,
+    hasOtherPets: false,
+    distanceRange: 25,
+    allergies: [],
+  },
+};
+
 export const useStore = create<AppState>((set) => ({
-  user: null,
-  profile: null,
+  user: DEMO_USER,
+  profile: DEMO_PROFILE,
   matches: [],
   bookings: [],
   rewards: null,
@@ -44,7 +76,7 @@ export const useStore = create<AppState>((set) => ({
     rewardsEnabled: true,
   },
   favoritePetIds: [],
-  backgroundCheckStatus: 'not_started',
+  backgroundCheckStatus: 'approved',
   backgroundCheckApplication: null,
 
   setUser: (user) => set({ user }),
