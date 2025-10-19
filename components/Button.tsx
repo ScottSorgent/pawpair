@@ -1,7 +1,8 @@
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle, View } from 'react-native';
 import { colors, borderRadius, spacing, typography } from '@/constants/theme';
+import { ReactElement } from 'react';
 
-type ButtonVariant = 'primary' | 'ghost' | 'outline';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline';
 
 interface ButtonProps {
   title: string;
@@ -11,6 +12,7 @@ interface ButtonProps {
   loading?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  icon?: ReactElement;
 }
 
 export function Button({
@@ -21,12 +23,43 @@ export function Button({
   loading = false,
   style,
   textStyle,
+  icon,
 }: ButtonProps) {
+  const getButtonStyle = () => {
+    switch (variant) {
+      case 'primary':
+        return styles.primary;
+      case 'secondary':
+        return styles.secondary;
+      case 'ghost':
+        return styles.ghost;
+      case 'outline':
+        return styles.outline;
+      default:
+        return styles.primary;
+    }
+  };
+
+  const getTextStyle = () => {
+    switch (variant) {
+      case 'primary':
+        return styles.primaryText;
+      case 'secondary':
+        return styles.secondaryText;
+      case 'ghost':
+        return styles.ghostText;
+      case 'outline':
+        return styles.outlineText;
+      default:
+        return styles.primaryText;
+    }
+  };
+
   return (
     <TouchableOpacity
       style={[
         styles.button,
-        variant === 'primary' ? styles.primary : styles.ghost,
+        getButtonStyle(),
         disabled && styles.disabled,
         style,
       ]}
@@ -37,16 +70,19 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={variant === 'primary' ? colors.surface : colors.primary} />
       ) : (
-        <Text
-          style={[
-            styles.text,
-            variant === 'primary' ? styles.primaryText : styles.ghostText,
-            disabled && styles.disabledText,
-            textStyle,
-          ]}
-        >
-          {title}
-        </Text>
+        <View style={styles.content}>
+          {icon && <View style={styles.iconContainer}>{icon}</View>}
+          <Text
+            style={[
+              styles.text,
+              getTextStyle(),
+              disabled && styles.disabledText,
+              textStyle,
+            ]}
+          >
+            {title}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -61,8 +97,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 48,
   },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconContainer: {
+    marginRight: spacing.sm,
+  },
   primary: {
     backgroundColor: colors.primary,
+  },
+  secondary: {
+    backgroundColor: colors.secondary,
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -82,6 +129,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   primaryText: {
+    color: colors.surface,
+  },
+  secondaryText: {
     color: colors.surface,
   },
   ghostText: {

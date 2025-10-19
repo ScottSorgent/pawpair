@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { colors, spacing, typography, borderRadius } from '@/constants/theme';
 import { useStore } from '@/store/useStore';
 import { PetCard } from '@/components/PetCard';
-import { FilterModal } from '@/components/FilterModal';
+import { FilterModal, FilterOptions } from '@/components/FilterModal';
 import { Tag } from '@/components/Tag';
 import { Toast } from '@/components/Toast';
 import { EmptyState } from '@/components/EmptyState';
@@ -12,13 +12,6 @@ import { OfflineBanner } from '@/components/OfflineBanner';
 import { Search, Bell, SlidersHorizontal, Heart, AlertCircle, X } from 'lucide-react-native';
 import { pets } from '@/services/pets';
 import { Pet } from '@/types';
-
-interface FilterOptions {
-  species: string[];
-  age: string[];
-  energy: string[];
-  distance: number;
-}
 
 export default function Home() {
   const router = useRouter();
@@ -33,8 +26,13 @@ export default function Home() {
   const [filters, setFilters] = useState<FilterOptions>({
     species: [],
     age: [],
+    size: [],
+    gender: [],
     energy: [],
+    kidFriendly: null,
     distance: 25,
+    location: '',
+    organization: null,
   });
   const [petList, setPetList] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -240,8 +238,13 @@ export default function Home() {
             setFilters({
               species: [],
               age: [],
+              size: [],
+              gender: [],
               energy: [],
+              kidFriendly: null,
               distance: 25,
+              location: '',
+              organization: null,
             });
             setSelectedQuickFilter(null);
             loadPets();

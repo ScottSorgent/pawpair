@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User, Profile, Match, Booking, Reward, Shelter } from '@/types';
+import { User, Profile, Match, Booking, Reward, Shelter, BackgroundCheckApplication } from '@/types';
 
 interface FeatureFlags {
   rewardsEnabled: boolean;
@@ -15,6 +15,7 @@ interface AppState {
   featureFlags: FeatureFlags;
   favoritePetIds: string[];
   backgroundCheckStatus: 'not_started' | 'required' | 'pending' | 'approved' | 'rejected';
+  backgroundCheckApplication: BackgroundCheckApplication | null;
 
   setUser: (user: User | null) => void;
   setProfile: (profile: Profile | null) => void;
@@ -28,6 +29,7 @@ interface AppState {
   setFeatureFlags: (flags: Partial<FeatureFlags>) => void;
   toggleFavorite: (petId: string) => void;
   setBackgroundCheckStatus: (status: 'not_started' | 'required' | 'pending' | 'approved' | 'rejected') => void;
+  setBackgroundCheckApplication: (application: BackgroundCheckApplication | null) => void;
   clearStore: () => void;
 }
 
@@ -43,6 +45,7 @@ export const useStore = create<AppState>((set) => ({
   },
   favoritePetIds: [],
   backgroundCheckStatus: 'not_started',
+  backgroundCheckApplication: null,
 
   setUser: (user) => set({ user }),
 
@@ -87,6 +90,8 @@ export const useStore = create<AppState>((set) => ({
 
   setBackgroundCheckStatus: (status) => set({ backgroundCheckStatus: status }),
 
+  setBackgroundCheckApplication: (application) => set({ backgroundCheckApplication: application }),
+
   clearStore: () =>
     set({
       user: null,
@@ -100,5 +105,6 @@ export const useStore = create<AppState>((set) => ({
       },
       favoritePetIds: [],
       backgroundCheckStatus: 'not_started',
+      backgroundCheckApplication: null,
     }),
 }));

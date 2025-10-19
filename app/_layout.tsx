@@ -26,15 +26,15 @@ export default function RootLayout() {
           }}
         />
 
-        <Stack.Screen name="home" options={{ href: null }} />
-        <Stack.Screen name="my-visits" options={{ href: null }} />
-        <Stack.Screen name="saved-pets" options={{ href: null }} />
-        <Stack.Screen name="inbox" options={{ href: null }} />
-        <Stack.Screen name="profile" options={{ href: null }} />
-        <Stack.Screen name="staff-dashboard" options={{ href: null }} />
-        <Stack.Screen name="staff-bookings" options={{ href: null }} />
-        <Stack.Screen name="staff-pets" options={{ href: null }} />
-        <Stack.Screen name="staff-reports" options={{ href: null }} />
+        <Stack.Screen name="home" />
+        <Stack.Screen name="my-visits" />
+        <Stack.Screen name="saved-pets" />
+        <Stack.Screen name="inbox" />
+        <Stack.Screen name="profile" />
+        <Stack.Screen name="staff-dashboard" />
+        <Stack.Screen name="staff-bookings" />
+        <Stack.Screen name="staff-pets" />
+        <Stack.Screen name="staff-reports" />
 
         <Stack.Screen
           name="onboarding"

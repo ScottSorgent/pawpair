@@ -48,6 +48,7 @@ export interface Pet {
   imageUrl: string;
   images?: string[];
   shelterId: string;
+  shelterName?: string;
   availableForAdoption: boolean;
   traits?: {
     energyLevel?: string;
@@ -89,6 +90,7 @@ export interface Booking {
 }
 
 export interface Feedback {
+  bookingId?: string;
   rating: number;
   visitExperience?: string;
   petInteraction?: string;

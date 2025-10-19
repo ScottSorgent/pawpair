@@ -22,6 +22,7 @@ export const colors = {
   hold: '#E8A94D',
   available: '#4CAF50',
   adopted: '#4A7C7E',
+  white: '#FFFFFF',
 };
 
 export const spacing = {
@@ -56,6 +57,11 @@ export const typography = {
     fontSize: 20,
     fontWeight: '600' as const,
     lineHeight: 28,
+  },
+  h4: {
+    fontSize: 18,
+    fontWeight: '600' as const,
+    lineHeight: 24,
   },
   body: {
     fontSize: 16,

@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { colors } from '@/constants/theme';
 import { StaffPet } from '@/services/staff';
 import { Card } from './Card';
-import { Badge } from './Badge';
 import { RatingStars } from './RatingStars';
 
 interface StaffPetCardProps {
@@ -46,10 +45,9 @@ export function StaffPetCard({ pet, onPress }: StaffPetCardProps) {
           {pet.species} • {pet.breedMix}
         </Text>
         <View style={styles.footer}>
-          <Badge
-            text={getAvailabilityLabel(pet.availability)}
-            color={getAvailabilityColor(pet.availability)}
-          />
+          <View style={[styles.badge, { backgroundColor: getAvailabilityColor(pet.availability) }]}>
+            <Text style={styles.badgeText}>{getAvailabilityLabel(pet.availability)}</Text>
+          </View>
           {pet.avgRating && (
             <View style={styles.rating}>
               <RatingStars rating={pet.avgRating} size={14} />
@@ -91,6 +89,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.surface,
   },
   rating: {
     flexDirection: 'row',
