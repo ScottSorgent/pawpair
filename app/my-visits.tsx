@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { Calendar, MapPin, Clock, CheckCircle, XCircle, Edit, MessageSquare } from 'lucide-react-native';
 import { booking as bookingService } from '@/services/booking';
+import { pets as petsService } from '@/services/pets';
 import { useStore } from '@/store/useStore';
 import { Booking } from '@/types';
 
@@ -38,7 +39,20 @@ export default function MyVisits() {
     setError(null);
     try {
       const data = await bookingService.list(user?.id || '1');
-      setBookings(data);
+
+      const bookingsWithPets = await Promise.all(
+        data.map(async (booking) => {
+          try {
+            const pet = await petsService.get(booking.petId);
+            return { ...booking, pet };
+          } catch (error) {
+            console.error(`Failed to load pet ${booking.petId}:`, error);
+            return booking;
+          }
+        })
+      );
+
+      setBookings(bookingsWithPets);
       setIsOffline(false);
     } catch (error: any) {
       console.error('Failed to load bookings:', error);
