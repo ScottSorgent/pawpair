@@ -29,6 +29,8 @@ import {
   ExternalLink,
 } from 'lucide-react-native';
 import { petfinderService } from '@/services/petfinderService';
+import { pets } from '@/services/pets';
+import { Pet } from '@/types';
 
 interface PetfinderPet {
   id: number;
@@ -99,11 +101,13 @@ export default function PetDetail() {
   const petId = params.id as string;
 
   const [pet, setPet] = useState<PetfinderPet | null>(null);
+  const [mockPet, setMockPet] = useState<Pet | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [similarPets, setSimilarPets] = useState<PetfinderPet[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [useMockData, setUseMockData] = useState(false);
   const [toast, setToast] = useState<{
     visible: boolean;
     message: string;
@@ -125,6 +129,14 @@ export default function PetDetail() {
   const loadPetDetails = async () => {
     setLoading(true);
     try {
+      if (petId.startsWith('mock-pet-')) {
+        setUseMockData(true);
+        const mockPetData = await pets.get(petId);
+        setMockPet(mockPetData);
+        setLoading(false);
+        return;
+      }
+
       const petData = await petfinderService.getPet(parseInt(petId));
 
       if (!petData) {
@@ -318,6 +330,146 @@ export default function PetDetail() {
             <View style={styles.skeletonCard} />
           </View>
         </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  if (useMockData && mockPet) {
+    const images = mockPet.images && mockPet.images.length > 0 ? mockPet.images : [mockPet.imageUrl];
+
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+            <ArrowLeft size={24} color={colors.text} />
+          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity onPress={handleSave} style={styles.headerButton}>
+              <Heart
+                size={24}
+                color={isSaved ? colors.error : colors.text}
+                fill={isSaved ? colors.error : 'none'}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleShare} style={styles.headerButton}>
+              <Share2 size={24} color={colors.text} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <ImageCarousel images={images} height={400} />
+
+          <View style={styles.content}>
+            <View style={styles.titleSection}>
+              <Text style={styles.name}>{mockPet.name}</Text>
+              <View style={styles.basicInfo}>
+                <Text style={styles.breed}>{mockPet.breed || mockPet.species}</Text>
+                <Text style={styles.separator}>•</Text>
+                <Text style={styles.infoText}>{mockPet.sex || 'Unknown'}</Text>
+                <Text style={styles.separator}>•</Text>
+                <Text style={styles.infoText}>{mockPet.age} years</Text>
+                <Text style={styles.separator}>•</Text>
+                <Text style={styles.infoText}>{mockPet.size}</Text>
+              </View>
+            </View>
+
+            <View style={styles.tags}>
+              {mockPet.traits?.kidFriendly !== undefined && (
+                <Tag
+                  label={mockPet.traits.kidFriendly ? 'Good with Kids' : 'Not for Kids'}
+                  variant={mockPet.traits.kidFriendly ? 'success' : 'default'}
+                />
+              )}
+              {mockPet.traits?.dogFriendly !== undefined && (
+                <Tag
+                  label={mockPet.traits.dogFriendly ? 'Good with Dogs' : 'No Dogs'}
+                  variant={mockPet.traits.dogFriendly ? 'info' : 'default'}
+                />
+              )}
+              {mockPet.traits?.catFriendly !== undefined && (
+                <Tag
+                  label={mockPet.traits.catFriendly ? 'Good with Cats' : 'No Cats'}
+                  variant={mockPet.traits.catFriendly ? 'warning' : 'default'}
+                />
+              )}
+            </View>
+
+            {mockPet.description && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>About {mockPet.name}</Text>
+                <Text style={styles.sectionText}>{mockPet.description}</Text>
+                {mockPet.temperament && mockPet.temperament.length > 0 && (
+                  <View style={styles.temperamentTags}>
+                    {mockPet.temperament.map((tag) => (
+                      <Tag key={tag} label={tag} />
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Health & Care</Text>
+              <View style={styles.healthGrid}>
+                <View style={styles.healthItem}>
+                  {mockPet.health?.spayedNeutered ? (
+                    <Check size={20} color={colors.success} />
+                  ) : (
+                    <X size={20} color={colors.error} />
+                  )}
+                  <Text style={styles.healthText}>Spayed/Neutered</Text>
+                </View>
+                <View style={styles.healthItem}>
+                  {mockPet.health?.vaccinated ? (
+                    <Check size={20} color={colors.success} />
+                  ) : (
+                    <X size={20} color={colors.error} />
+                  )}
+                  <Text style={styles.healthText}>Vaccinated</Text>
+                </View>
+                {mockPet.behavior?.training && (
+                  <View style={styles.healthItem}>
+                    <Check size={20} color={colors.success} />
+                    <Text style={styles.healthText}>{mockPet.behavior.training}</Text>
+                  </View>
+                )}
+                {mockPet.health?.specialNeeds && (
+                  <View style={styles.healthItem}>
+                    <Info size={20} color={colors.warning} />
+                    <Text style={styles.healthText}>{mockPet.health.specialNeeds}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.disclaimerBox}>
+              <Info size={16} color={colors.textSecondary} />
+              <Text style={styles.disclaimerText}>
+                This is demo data. Contact the shelter to confirm availability and details.
+              </Text>
+            </View>
+
+            <View style={styles.bottomSpacer} />
+          </View>
+        </ScrollView>
+
+        <View style={styles.footer}>
+          <View style={styles.footerButtons}>
+            <Button
+              title="Book Visit"
+              onPress={handleBookVisit}
+              style={styles.bookButton}
+            />
+          </View>
+        </View>
+
+        <Toast
+          visible={toast.visible}
+          message={toast.message}
+          type={toast.type}
+          onHide={() => setToast({ ...toast, visible: false })}
+        />
       </SafeAreaView>
     );
   }
