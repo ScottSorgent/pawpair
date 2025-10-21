@@ -75,7 +75,7 @@ export const useStore = create<AppState>((set) => ({
   featureFlags: {
     rewardsEnabled: true,
   },
-  favoritePetIds: [],
+  favoritePetIds: ['mock-pet-2', 'mock-pet-4', 'mock-pet-6'],
   backgroundCheckStatus: 'approved',
   backgroundCheckApplication: null,
 
